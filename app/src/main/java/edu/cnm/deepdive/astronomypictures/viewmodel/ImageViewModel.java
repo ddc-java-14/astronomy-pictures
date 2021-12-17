@@ -14,6 +14,7 @@ import edu.cnm.deepdive.astronomypictures.model.entity.Image;
 import edu.cnm.deepdive.astronomypictures.service.AstronomyDatabase;
 import edu.cnm.deepdive.astronomypictures.service.ImageRepository;
 import edu.cnm.deepdive.astronomypictures.service.WebServiceProxy;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class ImageViewModel extends AndroidViewModel implements LifecycleObserve
   private final MutableLiveData<Long> imageId;
   private final LiveData<Image> image;
   private final MutableLiveData<Image> apod;
+  private final MutableLiveData<List<Image>> randomImages;
   private final CompositeDisposable pending;
   private final AstronomyDatabase database;
 
@@ -34,9 +36,9 @@ public class ImageViewModel extends AndroidViewModel implements LifecycleObserve
     throwable = new MutableLiveData<>();
     imageId = new MutableLiveData<>();
     image = Transformations.switchMap(imageId, repository::get);
+    randomImages = new MutableLiveData<>();
     pending = new CompositeDisposable();
     apod = new MutableLiveData<>();
-    loadAPOD();
   }
 
   public LiveData<Image> getImage() {
@@ -45,6 +47,10 @@ public class ImageViewModel extends AndroidViewModel implements LifecycleObserve
 
   public LiveData<Image> getApod() {
     return apod;
+  }
+
+  public LiveData<List<Image>> getRandomImages() {
+    return randomImages;
   }
 
   public void setImageId(long id) {
@@ -76,6 +82,16 @@ public class ImageViewModel extends AndroidViewModel implements LifecycleObserve
         repository.get()
             .subscribe(
                 apod::postValue,
+                throwable::postValue
+            )
+    );
+  }
+
+  public void loadRandomImages() {
+    pending.add(
+        repository.getRandomImages()
+            .subscribe(
+                randomImages::postValue,
                 throwable::postValue
             )
     );

@@ -16,4 +16,8 @@
     <item name="itemBackground">?attr/drawableNavigationItemBackground</item>
   </style>
 
+  <style name="ImageSpinner" parent="TextAppearance.AppCompat.Widget.TextView.SpinnerItem">
+    <item name="android:textColor">?android:attr/colorAccent</item>
+  </style>
+
 </resources>

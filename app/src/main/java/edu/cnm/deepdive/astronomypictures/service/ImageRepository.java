@@ -56,6 +56,11 @@ public class ImageRepository {
         .subscribeOn(Schedulers.io());
   }
 
+  public Single<List<Image>> getRandomImages() {
+    return proxy.getRandomImages(BuildConfig.API_KEY, "10")
+        .subscribeOn(Schedulers.io());
+  }
+
   public Completable delete(Image image) {
     return (image.getId() == 0)
         ? Completable.complete()

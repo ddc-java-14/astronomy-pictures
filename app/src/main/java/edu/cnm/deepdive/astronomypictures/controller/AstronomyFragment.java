@@ -4,20 +4,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Picasso;
 import edu.cnm.deepdive.astronomypictures.R;
-import edu.cnm.deepdive.astronomypictures.adapter.ImageAdapter;
-import edu.cnm.deepdive.astronomypictures.databinding.FragmentImageBinding;
-import edu.cnm.deepdive.astronomypictures.model.entity.Image;
-import edu.cnm.deepdive.astronomypictures.viewmodel.AstronomyPicturesViewModel;
 import edu.cnm.deepdive.astronomypictures.databinding.FragmentAstronomyBinding;
+import edu.cnm.deepdive.astronomypictures.model.entity.Image;
 import edu.cnm.deepdive.astronomypictures.viewmodel.ImageViewModel;
 
 public class AstronomyFragment extends Fragment {
@@ -31,6 +28,21 @@ public class AstronomyFragment extends Fragment {
   public View onCreateView(
       LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     binding = FragmentAstronomyBinding.inflate(inflater, container, false);
+    binding.apodSelector.setOnItemSelectedListener(new OnItemSelectedListener() {
+
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Image image = (Image) parent.getItemAtPosition(position);
+        binding.title.setText(image.getTitle());
+        Picasso.get().load(image.getUrl()).into(binding.image);
+
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+
+      }
+    });
     return binding.getRoot();
   }
 
@@ -38,13 +50,13 @@ public class AstronomyFragment extends Fragment {
     super.onViewCreated(view, savedInstanceState);
     viewModel = new ViewModelProvider(this).get(ImageViewModel.class);
     getLifecycle().addObserver(viewModel);
-    viewModel.loadAPOD();
-    viewModel
-        .getApod()
-        .observe(getViewLifecycleOwner(), (apod) -> {
-          binding.title.setText(apod.getTitle());
-          Picasso.get().load(apod.getUrl()).into(binding.image);
-        });
+    viewModel.loadRandomImages();
+    viewModel.getRandomImages().observe(getViewLifecycleOwner(), (images) -> {
+      ArrayAdapter<Image> adapter = new ArrayAdapter<>(getContext(), R.layout.item_image_spinner,
+          images);
+      adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+      binding.apodSelector.setAdapter(adapter);
+    });
     viewModel.getThrowable()
         .observe(getViewLifecycleOwner(), this::displayError);
   }

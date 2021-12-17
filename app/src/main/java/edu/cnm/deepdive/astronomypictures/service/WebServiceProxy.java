@@ -20,6 +20,8 @@ public interface WebServiceProxy {
 
   @GET("planetary/apod")
   Single<Image> get(@Query("api_key") String apiKey);
+  @GET("planetary/apod")
+  Single<List<Image>> getRandomImages(@Query("api_key") String apiKey, @Query("count") String count);
 
 //  default Single<Image> get() {
 //    return get(BuildConfig.API_KEY);

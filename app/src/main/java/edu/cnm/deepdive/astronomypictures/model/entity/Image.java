@@ -9,6 +9,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.time.LocalDate;
 import java.util.Date;
+import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings({ "NotNullFieldNotInitialized"})
 @Entity(
@@ -127,5 +128,11 @@ public class Image {
 
   public void setPath(String path) {
     this.path = path;
+  }
+
+  @NonNull
+  @Override
+  public String toString() {
+    return title;
   }
 }
